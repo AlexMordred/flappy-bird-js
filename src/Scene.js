@@ -174,7 +174,11 @@ class Scene
             // Remove the first two pips (top and bottom)
             this.sprites['pipes'].shift();
             this.sprites['pipes'].shift();
+
+            return true;
         }
+
+        return false;
     }
 
     /**

@@ -34,6 +34,8 @@ class Game
         };
 
         this.state = this.states.getReady;
+        this.score = 0;
+        this.bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
     }
 
     /**
@@ -51,7 +53,10 @@ class Game
             }
 
             // Remove pipes that went beyond the screen on the left
-            this.scene.recyclePipes();
+            if (this.scene.recyclePipes()) {
+                // If any were removed - increase the score
+                this.addScore();
+            }
         }
 
         this.update();
@@ -111,6 +116,27 @@ class Game
                 sprite.draw(this.ctx);
             }
         }
+
+        // Draw the score in game
+        this.ctx.fillStyle = '#fff';
+        this.ctx.strokeStyle = '#000';
+
+        if (this.state === this.states.game) {
+            this.ctx.lineWidth = 2;
+            this.ctx.font = '35px Teko';
+            this.ctx.fillText(this.score, this.canvas.width / 2, 50);
+            this.ctx.strokeText(this.score, this.canvas.width / 2, 50);
+        } else if (this.state === this.states.gameOver) {
+            this.ctx.font = '25px Teko';
+
+            // Current score
+            this.ctx.fillText(this.score, 225, 186);
+            this.ctx.strokeText(this.score, 225, 186);
+
+            // Best score
+            this.ctx.fillText(this.bestScore, 225, 228);
+            this.ctx.strokeText(this.bestScore, 225, 228);
+        }
     }
 
     /**
@@ -165,6 +191,16 @@ class Game
     }
 
     /**
+     * Increment the game score by 1
+     */
+    addScore() {
+        this.score++;
+        this.bestScore = Math.max(this.score, this.bestScore);
+
+        localStorage.setItem('bestScore', this.bestScore);
+    }
+
+    /**
      * Start the game loop
      */
     run() {
@@ -190,6 +226,9 @@ class Game
                 sprite.reset();
             }
         }
+
+        // Reset the current score
+        this.score = 0;
     }
 
     /**
