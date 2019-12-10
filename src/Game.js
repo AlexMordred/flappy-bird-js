@@ -65,17 +65,29 @@ class Game
      * Update the scene state
      */
     update() {
-        // Determine which sprites should be updated
-        this.player.state.shouldUpdate = this.state !== this.states.gameOver;
-
         // Update all the sprites
         for (let name of this.scene.map) {
             for (let sprite of this.scene.sprites[name]) {
                 // Update the sprite's inGame flag
                 sprite.state.inGame = this.state === this.states.game;
+                sprite.state.shouldUpdate = this.state === this.states.game;
 
                 sprite.update(this.ctx, this.ticks);
             }
+        }
+
+        // Let the player fall to the ground after a collision
+        if (this.state === this.states.gameOver && this.player.y() + this.player.h() < this.canvas.clientHeight - this.scene.sprites['fg'][0].h()) {
+            this.player.state.inGame = true;
+
+            this.player.state.update(this.ctx, this.ticks);
+        }
+
+        // The player sprite animation should play on the Get Ready screen
+        if (this.state === this.states.getReady) {
+            this.player.state.shouldUpdate = true;
+
+            this.player.state.update(this.ctx, this.ticks);
         }
     }
 
@@ -110,6 +122,45 @@ class Game
             this.player.state.y = this.canvas.clientHeight - this.scene.sprites['fg'][0].h() - (this.player.h() / 2);
 
             this.gameOver();
+        }
+
+        for (let p of this.scene.sprites['pipes']) {
+            // Check if any of the 4 player sprite corners overlap with a pipe
+            const collision =
+                // Player's top right corner
+                (
+                    this.player.x() + this.player.w() >= p.x()
+                    && this.player.x() + this.player.w() <= p.x() + p.w()
+                    && this.player.y() >= p.y()
+                    && this.player.y() <= p.y() + p.h()
+                )
+                || 
+                // Player's bottom right corner
+                (
+                    this.player.x() + this.player.w() >= p.x()
+                    && this.player.x() + this.player.w() <= p.x() + p.w()
+                    && this.player.y() + this.player.h() >= p.y()
+                    && this.player.y() + this.player.h() <= p.y() + p.h()
+                )
+                || // Player's top left corner
+                (
+                    this.player.x() >= p.x()
+                    && this.player.x() <= p.x() + p.w()
+                    && this.player.y() >= p.y()
+                    && this.player.y() <= p.y() + p.h()
+                )
+                ||
+                // Player's bottom left corner
+                (
+                    this.player.x() >= p.x()
+                    && this.player.x() <= p.x() + p.w()
+                    && this.player.y() + this.player.h() >= p.y()
+                    && this.player.y() + this.player.h() <= p.y() + p.h()
+                );
+
+            if (collision) {
+                this.gameOver();
+            }
         }
     }
 
@@ -154,9 +205,6 @@ class Game
      */
     gameOver() {
         this.state = this.states.gameOver;
-
-        this.player.state.moving = false;
-        this.player.state.inGame = false;
     }
 
     /**

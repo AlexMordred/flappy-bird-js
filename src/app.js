@@ -18,27 +18,6 @@ game.run();
 // DIE.src = 'audio/sfx_die.wav';
 
 // // Objects
-// const pipes = {
-//     update: function () {
-//         for (let i = 0; i < this.position.length; i++) {
-//             let p = this.position[i];
-//             let bottomPipeYPos = p.y + this.h + this.gap;
-
-//             // Collision detection - top pipe
-//             if (bird.x + bird.radius > p.x && bird.x - bird.radius < p.x + this.w && bird.y + bird.radius > p.y && bird.y - bird.radius < p.y + this.h) {
-//                 states.current = states.over;
-//                 HIT.play();
-//             }
-
-//             // Collision detection - bottom pipe
-//             if (bird.x + bird.radius > p.x && bird.x - bird.radius < p.x + this.w && bird.y + bird.radius > bottomPipeYPos && bird.y - bird.radius < bottomPipeYPos + this.h) {
-//                 states.current = states.over;
-//                 HIT.play();
-//             }
-//         }
-//     },
-// };
-
 // const score = {
 //     best: parseInt(localStorage.getItem('best')) || 0,
 //     value: 0,
