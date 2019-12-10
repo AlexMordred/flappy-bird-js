@@ -49,8 +49,7 @@ class Game
      */
     update() {
         // Determine which sprites should be updated
-        this.scene.sprites['getReadyScreen'].state.shouldUpdate =
-            this.state === this.states.getReady;
+        this.player.state.shouldUpdate = this.state !== this.states.gameOver;
 
         // Update all the sprites
         for (let name of this.scene.map) {
@@ -95,7 +94,8 @@ class Game
     detectCollisions() {
         // Floot collision
         if (this.player.y() + this.player.h() >= this.canvas.clientHeight - this.scene.sprites['fg'].h()) {
-            this.player.state.y = this.canvas.clientHeight - this.scene.sprites['fg'].h() - this.player.h();
+            this.player.state.y = this.canvas.clientHeight - this.scene.sprites['fg'].h() - (this.player.h() / 2);
+
             this.gameOver();
         }
     }

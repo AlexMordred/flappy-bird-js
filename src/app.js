@@ -21,60 +21,6 @@ game.run();
 // DIE.src = 'audio/sfx_die.wav';
 
 // // Objects
-// const bird = {
-//     radius: 12,
-
-//     rotation: 0,
-
-//     draw: function () {
-//         let bird = this.animation[this.frame];
-
-//         ctx.save();
-
-//         ctx.translate(this.x, this.y);
-//         ctx.rotate(this.rotation);
-
-//         ctx.drawImage(sprite, bird.sX, bird.sY, this.w, this.h, -(this.w / 2), -(this.h / 2), this.w, this.h);
-
-//         ctx.restore();
-//     },
-
-//     update: function () {
-//         this.period = states.current === states.getReady ? 10 : 5;
-//         this.frame += frames % this.period === 0 ? 1 : 0;
-//         this.frame = this.frame % this.animation.length;
-
-//         if (states.current === states.getReady) {
-//             // Reset the game
-//             this.y = 150;
-//             this.rotation = 0;
-//         } else {
-//             this.speed += this.gravity;
-//             this.y += this.speed;
-
-//             if (this.y + (this.h / 2) >= cvs.height - fg.h) {
-//                 this.y = cvs.height - fg.h - (this.h / 2);
-
-//                 if (states.current === states.game) {
-//                     states.current = states.over;
-//                     DIE.play();
-//                 }
-//             }
-
-//             if (this.speed >= this.jump) {
-//                 this.rotation = 90 * DEGREE;
-//                 this.frame = 1;
-//             } else {
-//                 this.rotation = -25 * DEGREE;
-//             }
-//         }
-//     },
-
-//     resetSpeed: function () {
-//         this.speed = 0;
-//     }
-// };
-
 // const pipes = {
 //     position: [],
 
