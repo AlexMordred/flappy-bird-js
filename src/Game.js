@@ -1,4 +1,5 @@
 import Scene from './Scene';
+import Fx from './Fx';
 
 class Game
 {
@@ -20,6 +21,9 @@ class Game
             w: 83,
             h: 29,
         };
+
+        // Sound effects
+        this.fx = null;
 
         // Game loop
         this.loopInterval = null;
@@ -198,6 +202,8 @@ class Game
         this.bestScore = Math.max(this.score, this.bestScore);
 
         localStorage.setItem('bestScore', this.bestScore);
+        
+        this.fx.play('score');
     }
 
     /**
@@ -237,13 +243,19 @@ class Game
     start() {
         this.ticks = 0;
         this.state = this.states.game;
+
+        this.fx.play('swoosh');
     }
 
     /**
      * The player has lost
      */
     gameOver() {
-        this.state = this.states.gameOver;
+        if (this.state !== this.states.gameOver) {
+            this.fx.play('hit');
+
+            this.state = this.states.gameOver;
+        }
     }
 
     /**
@@ -254,7 +266,12 @@ class Game
         this.scene.initialize();
 
         // Load the sounds
-        // TODO:
+        this.fx = new Fx({
+            score: 'audio/sfx_point.wav',
+            flap: 'audio/sfx_flap.wav',
+            hit: 'audio/sfx_hit.wav',
+            swoosh: 'audio/sfx_swooshing.wav',
+        });
 
         // Game controls
         this.canvas.addEventListener('click', (e) => {
@@ -265,10 +282,8 @@ class Game
                     break;
                 case this.states.game:
                     this.player.flap();
+                    this.fx.play('flap');
 
-                    // FLAP.pause();
-                    // FLAP.currentTime = 0;
-                    // FLAP.play();
                     break;
                 case this.states.gameOver:
                     // Check if we click on the "start" button on the "game over" sprite
