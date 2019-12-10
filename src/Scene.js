@@ -8,22 +8,50 @@ class Scene
 
         this.srcImage = new Image();
 
-        this.sprites = {};
+        this.sprites = {
+            bg: [],
+            pipes: [],
+            player: [],
+            fg: [],
+            getReadyScreen: [],
+            gameOverScreen: [],
+        };
 
         this.map = [
             'bg',
+            'pipes',
             'player',
             'fg',
             'getReadyScreen',
             'gameOverScreen',
         ];
+
+        this.pipe = {
+            w: 53,
+            h: 400,
+            x: 0,
+            y: -150,
+            dx: -2,
+        };
+
+        this.topPipe = Object.assign({}, this.pipe, {
+            frames: [
+                { sX: 553, sY: 0 },
+            ],
+        });
+
+        this.bottomPipe = Object.assign({}, this.pipe, {
+            frames: [
+                { sX: 502, sY: 0 },
+            ],
+        });
     }
 
     initialize() {
         this.srcImage.src = 'img/sprite.png';
 
         // Background
-        this.sprites['bg'] = new Sprite(this.srcImage, {
+        this.sprites['bg'].push(new Sprite(this.srcImage, {
             y: this.canvas.clientHeight - 226,
             w: 275,
             h: 226,
@@ -47,10 +75,10 @@ class Scene
 
                 }
             }
-        });
+        }));
 
         // Foreground
-        this.sprites['fg'] = new Sprite(this.srcImage, {
+        this.sprites['fg'].push(new Sprite(this.srcImage, {
             y: this.canvas.clientHeight - 112,
             w: 224,
             h: 112,
@@ -74,10 +102,10 @@ class Scene
 
                 }
             }
-        });
+        }));
 
         // The bird (player)
-        this.sprites['player'] = new Bird(this.srcImage, {
+        this.sprites['player'].push(new Bird(this.srcImage, {
             x: 50,
             y: 150,
             w: 34,
@@ -90,10 +118,10 @@ class Scene
                 { sX: 276, sY: 139 },
             ],
             ticksPerFrame: 5,
-        });
+        }));
 
         // Get Ready screen
-        this.sprites['getReadyScreen'] = new Sprite(this.srcImage, {
+        this.sprites['getReadyScreen'].push(new Sprite(this.srcImage, {
             w: 173,
             h: 152,
             x: (this.canvas.clientWidth / 2) - (173 / 2),
@@ -102,10 +130,10 @@ class Scene
             frames: [
                 { sX: 0, sY: 228 },
             ],
-        });
+        }));
 
         // Game Over screen
-        this.sprites['gameOverScreen'] = new Sprite(this.srcImage, {
+        this.sprites['gameOverScreen'].push(new Sprite(this.srcImage, {
             w: 225,
             h: 202,
             x: (this.canvas.clientWidth / 2) - (225 / 2),
@@ -114,7 +142,46 @@ class Scene
             frames: [
                 { sX: 175, sY: 228 },
             ],
-        });
+        }));
+    }
+
+    /**
+     * Add a set of pipes at an X position and a random Y position
+     * @param {integer} x
+     * @param {integer} y
+     * @param {integer} gap
+     */
+    addPipes(x, y, gap) {
+        const topPipe = new Sprite(this.srcImage, Object.assign({}, this.topPipe, {
+            x: x,
+            y: y,
+        }));
+
+        const bottomPipe = new Sprite(this.srcImage, Object.assign({}, this.bottomPipe, {
+            x: x,
+            y: topPipe.y() + topPipe.h() + gap,
+        }));
+        
+        this.sprites['pipes'].push(topPipe);
+        this.sprites['pipes'].push(bottomPipe);
+    }
+
+    /**
+     * Remove pipes that went beyond the screen on the left
+     */
+    recyclePipes() {
+        if (this.sprites['pipes'].length >= 2 && this.sprites['pipes'][0].x() + this.sprites['pipes'][0].w() < 0) {
+            // Remove the first two pips (top and bottom)
+            this.sprites['pipes'].shift();
+            this.sprites['pipes'].shift();
+        }
+    }
+
+    /**
+     * Remove all the pipes
+     */
+    resetPipes() {
+        this.sprites['pipes'].splice(0, this.sprites['pipes'].length);
     }
 }
 

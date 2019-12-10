@@ -6,6 +6,9 @@ class Game
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
 
+        // Game settings
+        this.pipesGap = 85;
+
         // Scene & sprites
         this.scene = new Scene(this.canvas);
         this.player = null;
@@ -37,6 +40,20 @@ class Game
      * The game loop
      */
     loop() {
+        // The pipes
+        if (this.state === this.states.game) {
+            // Add a pipe every 100 ticks
+            if (this.ticks % 100 === 0) {
+                const y = -((this.canvas.clientHeight - this.scene.sprites['fg'][0].h()) / 2)
+                    * (Math.random() + 1);
+
+                this.scene.addPipes(this.canvas.clientWidth, y, this.pipesGap);
+            }
+
+            // Remove pipes that went beyond the screen on the left
+            this.scene.recyclePipes();
+        }
+
         this.update();
         this.draw();
         this.detectCollisions();
@@ -53,9 +70,7 @@ class Game
 
         // Update all the sprites
         for (let name of this.scene.map) {
-            let sprite = this.scene.sprites[name];
-
-            if (sprite) {
+            for (let sprite of this.scene.sprites[name]) {
                 // Update the sprite's inGame flag
                 sprite.state.inGame = this.state === this.states.game;
 
@@ -73,16 +88,14 @@ class Game
         this.ctx.fillRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
         
         // Determine which sprites should be drawn
-        this.scene.sprites['getReadyScreen'].state.shouldDraw =
+        this.scene.sprites['getReadyScreen'][0].state.shouldDraw =
             this.state === this.states.getReady;
-        this.scene.sprites['gameOverScreen'].state.shouldDraw =
+        this.scene.sprites['gameOverScreen'][0].state.shouldDraw =
             this.state === this.states.gameOver;
 
         // Draw all the sprites
         for (let name of this.scene.map) {
-            let sprite = this.scene.sprites[name];
-
-            if (sprite) {
+            for (let sprite of this.scene.sprites[name]) {
                 sprite.draw(this.ctx);
             }
         }
@@ -92,9 +105,9 @@ class Game
      * Detect collisions, update game state on a collision
      */
     detectCollisions() {
-        // Floot collision
-        if (this.player.y() + this.player.h() >= this.canvas.clientHeight - this.scene.sprites['fg'].h()) {
-            this.player.state.y = this.canvas.clientHeight - this.scene.sprites['fg'].h() - (this.player.h() / 2);
+        // Floor
+        if (this.player.y() + this.player.h() >= this.canvas.clientHeight - this.scene.sprites['fg'][0].h()) {
+            this.player.state.y = this.canvas.clientHeight - this.scene.sprites['fg'][0].h() - (this.player.h() / 2);
 
             this.gameOver();
         }
@@ -106,7 +119,7 @@ class Game
     run() {
         this.initialize();
 
-        this.player = this.scene.sprites['player'];
+        this.player = this.scene.sprites['player'][0];
 
         this.loopInterval = setInterval(() => {
             this.loop();
@@ -117,11 +130,12 @@ class Game
      * Reset the game state
      */
     reset() {
+        // Remove all the pipes
+        this.scene.resetPipes();
+
         // Update all the sprites
         for (let name of this.scene.map) {
-            let sprite = this.scene.sprites[name];
-
-            if (sprite) {
+            for (let sprite of this.scene.sprites[name]) {
                 sprite.reset();
             }
         }
@@ -131,6 +145,7 @@ class Game
      * Start the game
      */
     start() {
+        this.ticks = 0;
         this.state = this.states.game;
     }
 
